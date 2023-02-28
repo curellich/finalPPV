@@ -1,12 +1,18 @@
 from django.shortcuts import render, redirect
+from django.views.generic import View
+
 from .models import Shipment, Category, Tax, Surcharge
 from .forms import ShipmentForm, CategoryForm, TaxForm, SurchargeForm
 
 
 # Create your views here.
 
-def home(request):
-    return render(request, 'pages/home.html')
+# def home(request):
+#     return render(request, 'pages/home.html')
+
+class Home(View):
+    def get(self, request):
+        return render(request, 'pages/home.html')
 
 
 """Posts views"""
@@ -14,7 +20,6 @@ def home(request):
 
 def getShipments(request):
     shipments = Shipment.objects.all()
-
     return render(request, 'posts/index.html',
                   {'shipments': shipments})
 
@@ -23,7 +28,9 @@ def createShipment(request):
     form = ShipmentForm(request.POST or None)
     categories = Category.objects.all()
     if form.is_valid():
-        form.save()
+        shipment = form.save(commit=False)
+        shipment.save()  # Call the save method on the Shipment model instance
+        form.save_m2m()
         return redirect('shipments')
     return render(request, 'posts/create.html',
                   {'form': form, 'title': 'Crear Envío', 'categories': categories})
@@ -34,9 +41,17 @@ def editShipment(request, id):
     form = ShipmentForm(request.POST or None, instance=shipment)
     categories = Category.objects.all()
     if form.is_valid() and request.POST:
-        form.save()
+        shipment = form.save(commit=False)
+        shipment.save()  # Call the save method on the Shipment model instance
+        form.save_m2m()
         return redirect('shipments')
     return render(request, 'posts/edit.html', {'form': form, 'title': 'Editar Envío', 'categories': categories})
+
+# class EditShipment(UpdateView):
+#     model = Shipment
+#     template_name = 'posts/edit.html'
+#     form_class = ShipmentForm
+#     success_url = reverse_lazy('shipments')
 
 
 def deleteShipment(request, id):

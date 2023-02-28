@@ -75,14 +75,6 @@ class Shipment(models.Model):
     def __str__(self):
         return self.code
 
-    def save(self, *args, **kwargs):
-        request = kwargs.pop('request', None)
-        super(Shipment, self).save(*args, **kwargs)
-        categories = request.POST.getlist('categories')
-        for category_id in categories:
-            category = Category.objects.get(pk=category_id)
-            ShipmentCategory.objects.create(shipment=self, category=category)
-
     class Meta:
         db_table = 'shipments'
 
