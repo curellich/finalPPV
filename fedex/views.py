@@ -8,7 +8,7 @@ from .forms import ShipmentForm, CategoryForm, TaxForm, SurchargeForm
 
 class Home(TemplateView):
     def get(self, request):
-        return render(request, 'pages/home.html')
+        return render(request, 'home/home.html')
 
 
 """Posts views"""
@@ -48,6 +48,7 @@ class CreateShipment(View):
             shipment = form.save()
             taxes = Shipment.defineTaxesByCategories(shipment, selected_categories, taxes)
             shipment.taxes = taxes
+            shipment.final_price = Shipment.getTotalPrice(shipment)
             shipment.save()
 
             shipment_categories = [ShipmentCategory(shipment=shipment, category_id=category_id) for category_id in
@@ -85,9 +86,11 @@ class EditShipment(View):
 
         if form.is_valid():
             shipment.taxes = taxesToAdd
+            shipment.final_price = Shipment.getTotalPrice(shipment)
             shipment = form.save()
             shipment.categories.clear()
             shipment.surcharges.clear()
+
 
             shipment_categories = [ShipmentCategory(shipment=shipment, category_id=category_id) for category_id in
                                    selected_categories]
@@ -257,5 +260,13 @@ class DeleteSurcharge(View):
 """Queries views"""
 
 
-def queries(request):
-    return render(request, 'pages/queries.html')
+class GetQueries(View):
+    model = Shipment
+
+    def get(self, request):
+        shipments = Shipment.objects.all()
+        propicioAPerderse = Shipment.getTheLowestPriceFromShipmentDatabase(Shipment)
+
+
+        return render(request, 'home/queries.html',
+                      {'shipments': shipments, 'propicioAPerderse': propicioAPerderse})

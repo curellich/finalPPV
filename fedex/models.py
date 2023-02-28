@@ -63,12 +63,17 @@ class Shipment(models.Model):
     surcharges = models.ManyToManyField(Surcharge, through=SurchargeShipment)
     taxes = models.DecimalField(max_digits=9, null=True, default=0.00, decimal_places=2,
                                 verbose_name='Taxes')
+    final_price = models.DecimalField(max_digits=9, null=True, default=0.00, decimal_places=2,
+                                      verbose_name='Final Price')
 
     def __str__(self):
         return self.code
 
     class Meta:
         db_table = 'shipments'
+
+    def getTheLowestPriceFromShipmentDatabase(self):
+        return self.objects.all().order_by('final_price').first()
 
     def getWeight(self):
         return self.weight
@@ -146,7 +151,8 @@ class Shipment(models.Model):
         return self.base_price % 2 != 0
 
     def isNational(self):
-        return self.origin_country == self.destination_country
+        return self.origin_country == self.destination_country and self.origin_city != self.destination_city
 
     def getTotalPrice(self):
         return round((self.base_price + self.taxes + self.calculateSurcharges(self.getSurcharges())), 2)
+

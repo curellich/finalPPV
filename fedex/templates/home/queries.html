@@ -1,0 +1,119 @@
+{% extends "basePage.html" %}
+
+{% block title %} Consultas {% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Envíos Internacionales</h4>
+            <table class="table table-dark table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>CIUDAD ORIGEN</th>
+                    <th>PAIS ORIGEN</th>
+                    <th>CIUDAD DESTINO</th>
+                    <th>PAIS DESTINO</th>
+                    <th>PESO (Kg)</th>
+                    <th>PRECIO BASE($)</th>
+                    <th>CATEGORIAS</th>
+                    <th>IMPUESTOS</th>
+                    <th>RECARGOS</th>
+                    <th>PRECIO NETO</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for shipment in shipments %}
+                    {% if shipment.isInternational %}
+                        <tr>
+                            <td>{{ shipment.id }}</td>
+                            <td>{{ shipment.origin_city }}</td>
+                            <td>{{ shipment.origin_country }}</td>
+                            <td>{{ shipment.destination_city }}</td>
+                            <td>{{ shipment.destination_country }}</td>
+                            <td>{{ shipment.weight }}</td>
+                            <td>{{ shipment.base_price }}</td>
+                            <td>
+                                {% for category in shipment.getCategories %}
+                                    <ul>
+                                        <li>{{ category.name }}</li>
+                                    </ul>
+                                {% endfor %}
+                            </td>
+                            <td style="white-space: nowrap">
+                                {{ shipment.taxes }}
+                            </td>
+                            <td style="white-space: nowrap">
+                                {% for surcharge in shipment.getSurcharges %}
+                                    <ul>
+                                        <li>{{ surcharge.name }} : ${{ surcharge.amount }}</li>
+                                    </ul>
+                                {% endfor %}
+                            </td>
+                            <td>{{ shipment.getTotalPrice }}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br/>
+    <br/>
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Envío propicio a perderse</h4>
+            <table class="table table-dark table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>CIUDAD ORIGEN</th>
+                    <th>PAIS ORIGEN</th>
+                    <th>CIUDAD DESTINO</th>
+                    <th>PAIS DESTINO</th>
+                    <th>PESO (Kg)</th>
+                    <th>PRECIO BASE($)</th>
+                    <th>CATEGORIAS</th>
+                    <th>IMPUESTOS</th>
+                    <th>RECARGOS</th>
+                    <th>PRECIO NETO</th>
+                </tr>
+                </thead>
+                <tbody>
+                        <tr>
+                            <td>{{ propicioAPerderse.id }}</td>
+                            <td>{{ propicioAPerderse.origin_city }}</td>
+                            <td>{{ propicioAPerderse.origin_country }}</td>
+                            <td>{{ propicioAPerderse.destination_city }}</td>
+                            <td>{{ propicioAPerderse.destination_country }}</td>
+                            <td>{{ propicioAPerderse.weight }}</td>
+                            <td>{{ propicioAPerderse.base_price }}</td>
+                            <td>
+                                {% for category in propicioAPerderse.getCategories %}
+                                    <ul>
+                                        <li>{{ category.name }}</li>
+                                    </ul>
+                                {% endfor %}
+                            </td>
+                            <td style="white-space: nowrap">
+                                {{ propicioAPerderse.taxes }}
+                            </td>
+                            <td style="white-space: nowrap">
+                                {% for surcharge in propicioAPerderse.getSurcharges %}
+                                    <ul>
+                                        <li>{{ surcharge.name }} : ${{ surcharge.amount }}</li>
+                                    </ul>
+                                {% endfor %}
+                            </td>
+                            <td>{{ propicioAPerderse.getTotalPrice }}</td>
+                        </tr>
+
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
