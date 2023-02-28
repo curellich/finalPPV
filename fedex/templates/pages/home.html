@@ -1,0 +1,17 @@
+{% extends "basePage.html" %}
+
+{% block title %} Incio {% endblock %}
+
+{% block content %}
+
+    <div class="jumbotron">
+        <h1 class="display-3">Bienvenidos a la APP Fedex</h1>
+        <p class="lead">Empezar a consultar envios</p>
+        <hr class="my-2">
+        <p class="lead">
+            <a class="btn btn-primary btn-lg" href="{% url 'settings' %}" role="button">Empezar</a>
+        </p>
+    </div>
+
+
+{% endblock %}

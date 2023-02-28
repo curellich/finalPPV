@@ -1,0 +1,81 @@
+{% extends "basePage.html" %}
+
+{% block title %} Envios {% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="'card-header">
+            <a name="" id="" class="btn btn-success" href='{% url 'createShipment' %}' role="button">Agregar envío</a>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Envíos</h4>
+            <table class="table table-dark table-striped table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>CIUDAD ORIGEN</th>
+                    <th>PAIS ORIGEN</th>
+                    <th>CIUDAD DESTINO</th>
+                    <th>PAIS DESTINO</th>
+                    <th>PESO (Kg)</th>
+                    <th>PRECIO BASE($)</th>
+                    <th>CATEGORIAS</th>
+                    <th>IMPUESTOS</th>
+                    <th>RECARGOS</th>
+                    <th>PRECIO NETO</th>
+                    <th>ACCIONES</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for shipment in shipments %}
+                    <tr>
+                        <td>{{ shipment.id }}</td>
+                        <td>{{ shipment.origin_city }}</td>
+                        <td>{{ shipment.origin_country }}</td>
+                        <td>{{ shipment.destination_city }}</td>
+                        <td>{{ shipment.destination_country }}</td>
+                        <td>{{ shipment.weight }}</td>
+                        <td>{{ shipment.base_price }}</td>
+                        <td>
+                            {% for category in shipment.getCategories %}
+                                <ul>
+                                    <li>{{ category.name }}</li>
+                                </ul>
+                            {% endfor %}
+                        </td>
+                        <td style="white-space: nowrap">
+                            {% for tax in shipment.getTaxes %}
+                                <ul>
+                                    <li>{{ tax.name }} : {{ tax.percentage }}%</li>
+                                </ul>
+                            {% endfor %}
+                        </td>
+                        <td style="white-space: nowrap">
+                            {% for surcharge in shipment.getSurcharges %}
+                                <ul>
+                                    <li>{{ surcharge.name }} : {{ surcharge.percentage }}%</li>
+                                </ul>
+                            {% endfor %}
+                        </td>
+                        <td>{{ shipment.getTotalPrice }}</td>
+                        <td><a class="btn btn-info" href='{% url 'editShipment' shipment.id %}' role="button">Editar</a>
+                            <br>
+                            <br>
+                            <a class="btn btn-danger" href='{% url 'deleteShipment' shipment.id %}'
+                               role="button">Borrar</a>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+                <tr>
+                    <td scope="row"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

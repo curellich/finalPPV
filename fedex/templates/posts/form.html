@@ -1,0 +1,43 @@
+<form enctype="multipart/form-data" method="post">
+
+    <h4 class="card-title">{{ title }}</h4>
+    {% csrf_token %}
+    {% for field in form %}
+
+        <div class="mb-3">
+            <label
+                    for=""
+                    class="form-label">{{ field.label }}:
+            </label>
+
+            <label>
+                <input
+                        type="{{ field.field.widget.input_type }}"
+                        class="form-control"
+                        name="{{ field.name }}"
+                        aria-describedby="helpId"
+                        placeholder="{{ field.label }}"
+                        value="{{ field.value | default:'' }}">
+            </label>
+            <br>
+        </div>
+        <div class="col-12 help-text">
+            {{ field.errors }}
+        </div>
+    {% endfor %}
+
+    <div>
+        {% for category in categories %}
+            <label>
+                <input type="checkbox" name="categories" value="{{ category.id }}">
+                {{ category.name }}
+            </label>
+        {% endfor %}
+    </div>
+    <br>
+    <br>
+
+
+    <input class="btn btn-success" type="submit" value="Cargar">
+    <a class="btn btn-primary" href="{% url 'shipments' %}" role="button">Cancelar</a>
+</form>

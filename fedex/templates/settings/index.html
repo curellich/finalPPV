@@ -1,0 +1,143 @@
+{% extends "basePage.html" %}
+
+{% block title %} Configuración {% endblock %}
+
+{% block content %}
+
+    <div class="card">
+        <div class="'card-header">
+            <a name="" id="" class="btn btn-success" href='{% url 'createCategory' %}' role="button">Agregar
+                Categoría</a>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Categorias</h4>
+            <table class="table table-dark table-striped table-bordered">
+                <thead style="text-align: center">
+                <tr>
+                    <th>ID</th>
+                    <th>NOMBRE</th>
+                    <th>PORCENTAJE</th>
+                </tr>
+                </thead>
+                <tbody style="text-align: center">
+                {% for category in categories %}
+                    <tr>
+                        <td>{{ category.id }}</td>
+                        <td>{{ category.name }}</td>
+                        <td>{{ category.surcharge_percentage }}</td>
+                        <td><a class="btn btn-info" href='{% url 'editCategory' category.id %}' role="button">Editar</a>
+                            <a class="btn btn-danger" href='{% url 'deleteCategory' category.id %}' role="button">Borrar</a>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+                <tr>
+                    <td scope="row"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br/>
+    <br/>
+    <div class="card">
+        <div class="'card-header">
+            <a name="" id="" class="btn btn-success" href='{% url 'createTax' %}' role="button">Agregar
+                Impuesto</a>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Impuestos</h4>
+            <table class="table table-dark table-striped table-bordered">
+                <thead style="text-align: center">
+                <tr>
+                    <th>NOMBRE</th>
+                    <th>PORCENTAJE</th>
+                    <th>ACTIVO</th>
+                </tr>
+                </thead>
+                <tbody style="text-align: center">
+                {% for tax in taxes %}
+                    <tr>
+                        <td>{{ tax.name }}</td>
+                        <td>{{ tax.percentage }}</td>
+                        <td>
+                            {% if tax.active %}
+                                <label>
+                                    <h6 style="color: greenyellow">Activo</h6>
+                                </label>
+                            {% else %}
+                                <label>
+                                    <h6 style="color: red">Desactivado</h6>
+                                </label>
+                            {% endif %}
+                        </td>
+                        <td><a class="btn btn-info" href='{% url 'editTax' tax.id %}' role="button">Editar</a>
+                            <a class="btn btn-danger" href='{% url 'deleteTax' tax.id %}' role="button">Borrar</a>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+                <tr>
+                    <td scope="row"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br/>
+    <br/>
+    <div class="card">
+        <div class="'card-header">
+            <a name="" id="" class="btn btn-success" href='{% url 'createSurcharge' %}' role="button">Agregar
+                Recargo</a>
+        </div>
+        <div class="card-body">
+            <h4 class="card-title">Recargos</h4>
+            <table class="table table-dark table-striped table-bordered">
+                <thead style="text-align: center">
+                <tr>
+                    <th>NOMBRE</th>
+                    <th>PORCENTAJE</th>
+                    <th>VALOR</th>
+                    <th>ACTIVO</th>
+                </tr>
+                </thead>
+                <tbody style="text-align: center">
+                {% for surcharge in surcharges %}
+                    <tr>
+                        <td>{{ surcharge.name }}</td>
+                        <td>{{ surcharge.percentage }}</td>
+                        <td>{{ surcharge.amount }}</td>
+                        <td>
+                            {% if surcharge.active %}
+                                <label>
+                                    <h6 style="color: greenyellow">Activo</h6>
+                                </label>
+                            {% else %}
+                                <label>
+                                    <h6 style="color: red">Desactivado</h6>
+                                </label>
+                            {% endif %}
+                        </td>
+                        <td><a class="btn btn-info" href='{% url 'editSurcharge' surcharge.id %}' role="button">Editar</a>
+
+                            <a class="btn btn-danger" href='{% url 'deleteSurcharge' surcharge.id %}' role="button">Borrar</a>
+                        </td>
+                    </tr>
+
+                {% endfor %}
+                <tr>
+                    <td scope="row"></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}
