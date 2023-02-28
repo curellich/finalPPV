@@ -1,7 +1,7 @@
 from django.db import transaction
-from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse_lazy
-from django.views.generic import View, TemplateView, CreateView
+from django.shortcuts import render, redirect
+
+from django.views.generic import View, TemplateView
 from .models import Shipment, Category, Tax, Surcharge, ShipmentCategory, SurchargeShipment
 from .forms import ShipmentForm, CategoryForm, TaxForm, SurchargeForm
 
@@ -39,11 +39,17 @@ class CreateShipment(View):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
+
         selected_categories = request.POST.getlist('categories')
         selected_surcharge = request.POST.getlist('surcharges')
+        taxes = Tax.objects.filter(active=True)
 
         if form.is_valid():
             shipment = form.save()
+            taxes = Shipment.defineTaxesByCategories(shipment, selected_categories, taxes)
+            shipment.taxes = taxes
+            shipment.save()
+
             shipment_categories = [ShipmentCategory(shipment=shipment, category_id=category_id) for category_id in
                                    selected_categories]
             ShipmentCategory.objects.bulk_create(shipment_categories)
@@ -72,20 +78,23 @@ class EditShipment(View):
     def post(self, request, *args, **kwargs):
         shipment = self.model.objects.get(pk=kwargs['id'])
         form = self.form_class(request.POST, instance=shipment)
+        taxes = Tax.objects.filter(active=True)
         selected_categories = request.POST.getlist('categories')
         selected_surcharge = request.POST.getlist('surcharges')
+        taxesToAdd = Shipment.defineTaxesByCategories(shipment, selected_categories, taxes)
 
         if form.is_valid():
+            shipment.taxes = taxesToAdd
             shipment = form.save()
             shipment.categories.clear()
             shipment.surcharges.clear()
+
             shipment_categories = [ShipmentCategory(shipment=shipment, category_id=category_id) for category_id in
                                    selected_categories]
             ShipmentCategory.objects.bulk_create(shipment_categories)
 
             shipment_surcharges = [SurchargeShipment(shipment=shipment, surcharge_id=surcharge_id) for surcharge_id in
                                    selected_surcharge]
-
             SurchargeShipment.objects.bulk_create(shipment_surcharges)
             return redirect('shipments')
         return render(request, self.template_name, {'form': form, 'title': 'Editar Envío'})

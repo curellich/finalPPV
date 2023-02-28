@@ -45,11 +45,7 @@
                             {% endfor %}
                         </td>
                         <td style="white-space: nowrap">
-                            {% for tax in shipment.getTaxes %}
-                                <ul>
-                                    <li>{{ tax.name }} : {{ tax.percentage }}%</li>
-                                </ul>
-                            {% endfor %}
+                            {{ shipment.taxes }}
                         </td>
                         <td style="white-space: nowrap">
                             {% for surcharge in shipment.getSurcharges %}

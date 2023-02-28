@@ -61,6 +61,8 @@ class Shipment(models.Model):
     base_price = models.DecimalField(max_digits=9, default=0.00, decimal_places=2, verbose_name='Base Price')
     categories = models.ManyToManyField(Category, through=ShipmentCategory)
     surcharges = models.ManyToManyField(Surcharge, through=SurchargeShipment)
+    taxes = models.DecimalField(max_digits=9, null=True, default=0.00, decimal_places=2,
+                                verbose_name='Taxes')
 
     def __str__(self):
         return self.code
@@ -76,6 +78,9 @@ class Shipment(models.Model):
 
     def getSurcharges(self):
         return self.surcharges.all()
+
+    def getTaxes(self):
+        return self.taxes
 
     def calculateSurcharges(self, surcharges):
         total = 0
@@ -93,12 +98,55 @@ class Shipment(models.Model):
 
         return total
 
-    def calculateTaxes(self, taxes):
+    def defineTaxesByCategories(self, selected_categories, taxes):
+        surcharges = self.calculateSurcharges(self.getSurcharges())
+        netoPrice = self.base_price + surcharges
         total = 0
-        for tax in taxes:
-            total += tax.percentage * self.base_price / 100
+
+        try:
+            tax = taxes.get(name='IVA')
+            total += tax.percentage * netoPrice / 100
+        except Tax.DoesNotExist:
+            pass
+
+        if len(selected_categories) > 3:
+            try:
+                tax = taxes.get(name='Multicategoria')
+                total += tax.percentage * netoPrice / 100
+            except Tax.DoesNotExist:
+                pass
+
+        if self.isInternational():
+            try:
+                tax = taxes.get(name='Aduanero')
+                total += tax.percentage * netoPrice / 100
+            except Tax.DoesNotExist:
+                pass
+
+        if self.isBasePriceOdd():
+            try:
+                tax = taxes.get(name='Extraño')
+                total += tax.percentage * netoPrice / 100
+            except Tax.DoesNotExist:
+                pass
+
+        if self.isNational():
+            try:
+                tax = taxes.get(name='Municipal')
+                total += tax.percentage * netoPrice / 100
+            except Tax.DoesNotExist:
+                pass
 
         return total
 
+    def isInternational(self):
+        return self.origin_country != self.destination_country
+
+    def isBasePriceOdd(self):
+        return self.base_price % 2 != 0
+
+    def isNational(self):
+        return self.origin_country == self.destination_country
+
     def getTotalPrice(self):
-        return round((self.base_price + self.calculateSurcharges(self.getSurcharges())), 2)
+        return round((self.base_price + self.taxes + self.calculateSurcharges(self.getSurcharges())), 2)
