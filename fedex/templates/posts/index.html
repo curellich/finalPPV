@@ -54,7 +54,7 @@
                         <td style="white-space: nowrap">
                             {% for surcharge in shipment.getSurcharges %}
                                 <ul>
-                                    <li>{{ surcharge.name }} : {{ surcharge.percentage }}%</li>
+                                    <li>{{ surcharge.name }} : ${{ surcharge.amount }}</li>
                                 </ul>
                             {% endfor %}
                         </td>

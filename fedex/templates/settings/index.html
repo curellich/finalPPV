@@ -96,12 +96,11 @@
                 Recargo</a>
         </div>
         <div class="card-body">
-            <h4 class="card-title">Recargos</h4>
+            <h4 class="card-title">Recargos Arbitrarios</h4>
             <table class="table table-dark table-striped table-bordered">
                 <thead style="text-align: center">
                 <tr>
                     <th>NOMBRE</th>
-                    <th>PORCENTAJE</th>
                     <th>VALOR</th>
                     <th>ACTIVO</th>
                     <th>ACCIONES</th>
@@ -111,7 +110,6 @@
                 {% for surcharge in surcharges %}
                     <tr>
                         <td>{{ surcharge.name }}</td>
-                        <td>{{ surcharge.percentage }}</td>
                         <td>{{ surcharge.amount }}</td>
                         <td>
                             {% if surcharge.active %}

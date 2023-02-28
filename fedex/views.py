@@ -2,7 +2,7 @@ from django.db import transaction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import View, TemplateView, CreateView
-from .models import Shipment, Category, Tax, Surcharge, ShipmentCategory
+from .models import Shipment, Category, Tax, Surcharge, ShipmentCategory, SurchargeShipment
 from .forms import ShipmentForm, CategoryForm, TaxForm, SurchargeForm
 
 
@@ -28,8 +28,10 @@ class CreateShipment(View):
 
     def get(self, request, *args, **kwargs):
         categories = Category.objects.all()
+        surcharges = Surcharge.objects.filter(active=True)
         form = self.form_class()
-        return render(request, self.template_name, {'form': form, 'title': 'Crear Envío', 'categories': categories})
+        return render(request, self.template_name,
+                      {'form': form, 'title': 'Crear Envío', 'categories': categories, 'surcharges': surcharges})
 
     # @transaction.atomic se utiliza para garantizar la integridad de la base de datos en situaciones
     # donde múltiples operaciones deben ejecutarse como una sola transacción para evitar inconsistencias en la base
@@ -38,11 +40,17 @@ class CreateShipment(View):
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         selected_categories = request.POST.getlist('categories')
+        selected_surcharge = request.POST.getlist('surcharges')
+
         if form.is_valid():
             shipment = form.save()
             shipment_categories = [ShipmentCategory(shipment=shipment, category_id=category_id) for category_id in
                                    selected_categories]
             ShipmentCategory.objects.bulk_create(shipment_categories)
+
+            shipment_surcharges = [SurchargeShipment(shipment=shipment, surcharge_id=surcharge_id) for surcharge_id in
+                                   selected_surcharge]
+            SurchargeShipment.objects.bulk_create(shipment_surcharges)
             return redirect('shipments')
         return render(request, self.template_name, {'form': form, 'title': 'Crear Envío'})
 
@@ -55,20 +63,30 @@ class EditShipment(View):
     def get(self, request, *args, **kwargs):
         shipment = self.model.objects.get(pk=kwargs['id'])
         categories = Category.objects.all()
+        surcharges = Surcharge.objects.filter(active=True)
         form = self.form_class(instance=shipment)
-        return render(request, self.template_name, {'form': form, 'title': 'Editar Envío', 'categories': categories})
+        return render(request, self.template_name, {'form': form, 'title': 'Editar Envío', 'categories': categories,
+                                                    'surcharges': surcharges})
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         shipment = self.model.objects.get(pk=kwargs['id'])
         form = self.form_class(request.POST, instance=shipment)
         selected_categories = request.POST.getlist('categories')
+        selected_surcharge = request.POST.getlist('surcharges')
+
         if form.is_valid():
             shipment = form.save()
             shipment.categories.clear()
+            shipment.surcharges.clear()
             shipment_categories = [ShipmentCategory(shipment=shipment, category_id=category_id) for category_id in
                                    selected_categories]
             ShipmentCategory.objects.bulk_create(shipment_categories)
+
+            shipment_surcharges = [SurchargeShipment(shipment=shipment, surcharge_id=surcharge_id) for surcharge_id in
+                                   selected_surcharge]
+
+            SurchargeShipment.objects.bulk_create(shipment_surcharges)
             return redirect('shipments')
         return render(request, self.template_name, {'form': form, 'title': 'Editar Envío'})
 
@@ -133,14 +151,14 @@ class CreateSurcharge(View):
 
     def get(self, request, *args, **kwargs):
         form = self.form_class()
-        return render(request, self.template_name, {'form': form, 'title': 'Crear recargo'})
+        return render(request, self.template_name, {'form': form, 'title': 'Crear recargo Arbitratio'})
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
             form.save()
             return redirect('settings')
-        return render(request, self.template_name, {'form': form, 'title': 'Crear recargo'})
+        return render(request, self.template_name, {'form': form, 'title': 'Crear recargo Arbitrario'})
 
 
 class EditCategory(View):

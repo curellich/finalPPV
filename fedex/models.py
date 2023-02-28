@@ -27,7 +27,6 @@ class Tax(models.Model):
 class Surcharge(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, verbose_name='Surcharge Name')
-    percentage = models.DecimalField(max_digits=5, decimal_places=2, verbose_name='Surcharge Percentage')
     amount = models.DecimalField(max_digits=10, null=True, decimal_places=2, verbose_name='Surcharge Amount')
     active = models.BooleanField(default=False)
 
@@ -41,14 +40,6 @@ class ShipmentCategory(models.Model):
 
     class Meta:
         db_table = 'shipment_categories'
-
-
-class TaxShipment(models.Model):
-    tax = models.ForeignKey(Tax, on_delete=models.CASCADE)
-    shipment = models.ForeignKey('Shipment', on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'shipment_taxes'
 
 
 class SurchargeShipment(models.Model):
@@ -69,7 +60,6 @@ class Shipment(models.Model):
     weight = models.DecimalField(max_digits=9, default=0.00, decimal_places=2)
     base_price = models.DecimalField(max_digits=9, default=0.00, decimal_places=2, verbose_name='Base Price')
     categories = models.ManyToManyField(Category, through=ShipmentCategory)
-    taxes = models.ManyToManyField(Tax, through=TaxShipment)
     surcharges = models.ManyToManyField(Surcharge, through=SurchargeShipment)
 
     def __str__(self):
@@ -78,17 +68,37 @@ class Shipment(models.Model):
     class Meta:
         db_table = 'shipments'
 
+    def getWeight(self):
+        return self.weight
+
     def getCategories(self):
         return self.categories.all()
 
+    def getSurcharges(self):
+        return self.surcharges.all()
+
     def calculateSurcharges(self, surcharges):
         total = 0
-        for surcharge in surcharges:
-            if surcharge.percentage:
-                total += self.base_price * surcharge.percentage / 100
-            else:
-                total += surcharge.amount
+        categories = self.getCategories()
+
+        for category in categories:
+            total += category.surcharge_percentage * self.base_price / 100
+
+        weight = self.getWeight()
+        if weight > 1:
+            total += 80
+
+        for surcharge in self.getSurcharges():
+            total += surcharge.amount
+
+        return total
+
+    def calculateTaxes(self, taxes):
+        total = 0
+        for tax in taxes:
+            total += tax.percentage * self.base_price / 100
+
         return total
 
     def getTotalPrice(self):
-        return self.base_price + 1000
+        return round((self.base_price + self.calculateSurcharges(self.getSurcharges())), 2)

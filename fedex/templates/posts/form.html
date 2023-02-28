@@ -25,7 +25,7 @@
             {{ field.errors }}
         </div>
     {% endfor %}
-
+    <h4>Categorías</h4>
     <div>
         {% for category in categories %}
             <label>
@@ -34,9 +34,17 @@
             </label>
         {% endfor %}
     </div>
+    <h4>Recargos Arbitrarios</h4>
+    <div>
+        {% for surcharge in surcharges %}
+            <label>
+                <input type="checkbox" name="surcharges" value="{{ surcharge.id }}">
+                {{ surcharge.name }}
+            </label>
+        {% endfor %}
+    </div>
     <br>
     <br>
-
 
     <input class="btn btn-success" type="submit" value="Cargar">
     <a class="btn btn-primary" href="{% url 'shipments' %}" role="button">Cancelar</a>
