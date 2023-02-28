@@ -1,22 +1,23 @@
 from django.urls import path
 from . import views
+from .views import *
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('settings', views.getAllSettings, name='settings'),
-    path('shipments', views.getShipments, name='shipments'),
+    path('', Home.as_view(), name='home'),
+    path('settings', GetSettings.as_view(), name='settings'),
+    path('shipments', GetShipments.as_view(), name='shipments'),
     path('queries', views.queries, name='queries'),
-    path('shipments/create', views.createShipment, name='createShipment'),
-    path('shipments/edit/<int:id>', views.editShipment, name='editShipment'),
-    path('post/delete/<int:id>', views.deleteShipment, name='deleteShipment'),
-    path('settings/createCategory', views.createCategory, name='createCategory'),
-    path('settings/createTax', views.createTax, name='createTax'),
-    path('settings/createSurcharge', views.createSurcharge, name='createSurcharge'),
-    path('category/edit/<int:id>', views.editCategory, name='editCategory'),
-    path('tax/edit/<int:id>', views.editTax, name='editTax'),
-    path('settings/edit/<int:id>', views.editSurcharge, name='editSurcharge'),
-    path('category/delete/<int:id>', views.deleteCategory, name='deleteCategory'),
-    path('tax/delete/<int:id>', views.deleteTax, name='deleteTax'),
-    path('surcharge/delete/<int:id>', views.deleteSurcharge, name='deleteSurcharge'),
+    path('shipments/create', CreateShipment.as_view(), name='createShipment'),
+    path('shipments/edit/<int:id>', EditShipment.as_view(), name='editShipment'),
+    path('shipments/delete/<int:id>', DeleteShipment.as_view(), name='deleteShipment'),
+    path('settings/createCategory', CreateCategory.as_view(), name='createCategory'),
+    path('settings/createTax', CreateTax.as_view(), name='createTax'),
+    path('settings/createSurcharge', CreateSurcharge.as_view(), name='createSurcharge'),
+    path('category/edit/<int:id>', EditCategory.as_view(), name='editCategory'),
+    path('tax/edit/<int:id>', EditTax.as_view(), name='editTax'),
+    path('settings/edit/<int:id>', EditSurcharge.as_view(), name='editSurcharge'),
+    path('category/delete/<int:id>', DeleteCategory.as_view(), name='deleteCategory'),
+    path('tax/delete/<int:id>', DeleteTax.as_view(), name='deleteTax'),
+    path('surcharge/delete/<int:id>', DeleteSurcharge.as_view(), name='deleteSurcharge'),
 
 ]

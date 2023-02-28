@@ -81,11 +81,14 @@ class Shipment(models.Model):
     def getCategories(self):
         return self.categories.all()
 
-    def getTaxes(self):
-        return self.taxes.all()
-
-    def getSurcharges(self):
-        return self.surcharges.all()
+    def calculateSurcharges(self, surcharges):
+        total = 0
+        for surcharge in surcharges:
+            if surcharge.percentage:
+                total += self.base_price * surcharge.percentage / 100
+            else:
+                total += surcharge.amount
+        return total
 
     def getTotalPrice(self):
         return self.base_price + 1000
